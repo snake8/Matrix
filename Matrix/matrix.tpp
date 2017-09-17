@@ -6,6 +6,7 @@ template<> struct IsTypeInt<int> {
 	static const bool value = true; 
 };
 
+
 template<typename T> Matrix<T>::Matrix(size_t numOfRows, size_t numOfColumns)
 	: numOfRows(numOfRows)
 	, numOfColumns(numOfColumns) {
@@ -92,10 +93,4 @@ template<typename T> Matrix<T> operator+(Matrix<T>& mat1, Matrix<T>& mat2) {
 	} else {
 		cout << "Matrix is not equal" << endl; 
 	}
-}
-
-template<typename T> void Matrix<T>::clear() {
-	for (size_t i = 0; i < this->matrix.size(); i++)
-		for (size_t j = 0; j < this->matrix[i].size(); j++)
-			this->matrix[i][j] = 0; 
 }
