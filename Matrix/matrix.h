@@ -13,10 +13,6 @@ public:
 	T& operator()(int, int);
 	// making all values in matrix equal specific value 
 	void operator=(T); 
-
-	// TODO
-	void insertElementInTheEnd(T&);
-	void clear(); 
 };
 
 
