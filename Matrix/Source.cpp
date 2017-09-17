@@ -1,8 +1,6 @@
-#include "stdafx.h"
-#include "NeuralNetwork.h" 
 #include "matrix.h" 
 
-
+// test here
 int main() {
 
 	return 0;
