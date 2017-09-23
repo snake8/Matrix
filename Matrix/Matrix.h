@@ -104,10 +104,10 @@ Matrix<T> operator+(Matrix<T>& matrix1, Matrix<T>& matrix2) {
 
 template<typename T>
 Matrix<T> matrixMultiplication(Matrix<T>& matrix1, Matrix<T>& matrix2) {
-    if (IsTypeChar<T>::value || IsTypeString<T>::value) {
-        throw "Matrices of this type can't be multiplied!";
+    if (IsTypeString<T>::value || IsTypeChar<T>::value) {
+        throw "Matrices of this type can't be multiplyed";
     } else {
-        if (matrix1.size2() == matrix2.size1()) {
+        if (matrix1.size2() == matrix1.size1()) {
             Matrix<T> resultMatrix(matrix1.size1(), matrix2.size2());
             for (size_t i = 0; i < matrix1.size1(); i++) {
                 for (size_t j = 0; j < matrix2.size2(); j++) {
@@ -116,8 +116,9 @@ Matrix<T> matrixMultiplication(Matrix<T>& matrix1, Matrix<T>& matrix2) {
                 }
             }
             return resultMatrix;
-        } else
+        } else {
             throw "Matrices are not equal!";
+        }
     }
 }
 template<typename T>
@@ -125,11 +126,9 @@ Matrix<T> operator*(Matrix<T>& matrix1, Matrix<T>& matrix2) {
     try {
         return matrixMultiplication(matrix1, matrix2);
     } catch (char const* error) {
-        cout << error << endl; 
+        cout << error << endl;
     }
 }
-
-
 
 
 #endif /* Matrix_h */
