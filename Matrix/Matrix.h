@@ -31,10 +31,17 @@ public:
 };
 
 template<typename T>
-struct IsTypeInt {
+struct IsTypeString {
     static const bool value = false;
 };
-template<> struct IsTypeInt<int> {
+template<> struct IsTypeString<string> {
+    static const bool value = true;
+};
+template<typename T>
+struct IsTypeChar {
+    static const bool value = false;
+};
+template<> struct IsTypeChar<char> {
     static const bool value = true;
 };
 
@@ -49,19 +56,16 @@ template<typename T>
 size_t Matrix<T>::size1() {
     return this->matrix.size();
 }
-
 template<typename T>
 size_t Matrix<T>::size2() {
-    for (size_t i = 0; i < this->matrix.size(); i++)
-        return this->matrix[i].size();
+    return this->matrix[0].size();
 }
-
 template<typename T>
 T& Matrix<T>::operator()(size_t row, size_t col) {
     return this->matrix[row][col];
 }
 template<typename T>
-ostream& operator<<(ostream& os, Matrix<T>& matrix) {
+ostream& operator<<(ostream& os, Matrix<T> matrix) {
     for (size_t i = 0; i < matrix.size1(); i++) {
         for (size_t j = 0; j < matrix.size2(); j++)
             os << matrix(i, j) << " ";
@@ -76,39 +80,55 @@ void Matrix<T>::operator=(T value) {
             this->matrix[i][j] = value;
     }
 }
+
 template<typename T>
-void Matrix<T>::operator+=(T value) {
-    for (size_t i = 0; i < this->matrix.size(); i++) {
-        for (size_t j = 0; j < this->matrix[i].size(); j++)
-            this->matrix[i][j] += value;
+Matrix<T> matrixSum(Matrix<T>& matrix1, Matrix<T> matrix2) {
+    if (matrix1.size1() == matrix2.size1() && matrix1.size2() == matrix2.size2()) {
+        Matrix<T> resultMatrix(matrix1.size1(), matrix2.size2());
+        for (size_t i = 0; i < resultMatrix.size1(); i++) {
+            for (size_t j = 0; j < resultMatrix.size2(); j++)
+                resultMatrix(i, j) = matrix1(i, j) + matrix2(i, j);
+        }
+        return resultMatrix;
+    } else
+        throw "Matrixes are not equal!";
+}
+template<typename T>
+Matrix<T> operator+(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+    try {
+        return matrixSum(matrix1, matrix2);
+    } catch(char const* error) {
+        cout << error << endl;
     }
 }
 
-// does not work with strings and chars
-// TODO
 template<typename T>
 Matrix<T> matrixMultiplication(Matrix<T>& matrix1, Matrix<T>& matrix2) {
-    Matrix<T> resultMatrix(matrix1.size2(), matrix2.size1());
-    for (size_t i = 0; i < resultMatrix.size1(); i++) {
-        for (size_t j = 0; j < resultMatrix.size2(); j++) {
-            resultMatrix = 0;
-            for (size_t k = 0; k < resultMatrix.size2(); k++) {
-                try {
-                    resultMatrix += matrix1(i, k) * matrix2(k, j);
-                } catch (std::exception& e) {
-                    throw "Can't multiply matrix of this type:(";
+    if (IsTypeChar<T>::value || IsTypeString<T>::value) {
+        throw "Matrices of this type can't be multiplied!";
+    } else {
+        if (matrix1.size2() == matrix2.size1()) {
+            Matrix<T> resultMatrix(matrix1.size1(), matrix2.size2());
+            for (size_t i = 0; i < matrix1.size1(); i++) {
+                for (size_t j = 0; j < matrix2.size2(); j++) {
+                    for (size_t k = 0; k < matrix1.size2(); k++)
+                        resultMatrix(i, j) += matrix1(i, k) * matrix2(k, j);
                 }
             }
-        }
+            return resultMatrix;
+        } else
+            throw "Matrices are not equal!";
     }
-    return resultMatrix;
 }
 template<typename T>
-Matrix<T> operator*(Matrix<T> matrix1, Matrix<T> matrix2) {
-    if (matrix1.size2() == matrix2.size1()) {
+Matrix<T> operator*(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+    try {
         return matrixMultiplication(matrix1, matrix2);
+    } catch (char const* error) {
+        cout << error << endl; 
     }
 }
+
 
 
 
