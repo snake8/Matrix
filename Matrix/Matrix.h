@@ -13,28 +13,28 @@
 #ifndef Matrix_h
 #define Matrix_h
 
-using namespace std;
 
 template<typename T> class Matrix {
 private:
     size_t numberOfRows;
     size_t numberOfColumns;
-    vector<vector<T>> matrix;
-    
+    std::vector<std::vector<T>> matrix;
 public:
+    Matrix() = default;
     Matrix(size_t, size_t);
     size_t size1();
     size_t size2();
     T& operator()(size_t, size_t);
     void operator=(T);
     void operator+=(T);
+    void* transpose();
 };
 
 template<typename T>
 struct IsTypeString {
     static const bool value = false;
 };
-template<> struct IsTypeString<string> {
+template<> struct IsTypeString<std::string> {
     static const bool value = true;
 };
 template<typename T>
@@ -65,11 +65,11 @@ T& Matrix<T>::operator()(size_t row, size_t col) {
     return this->matrix[row][col];
 }
 template<typename T>
-ostream& operator<<(ostream& os, Matrix<T> matrix) {
+std::ostream& operator<<(std::ostream& os, Matrix<T> matrix) {
     for (size_t i = 0; i < matrix.size1(); i++) {
         for (size_t j = 0; j < matrix.size2(); j++)
             os << matrix(i, j) << " ";
-        cout << endl;
+        std::cout << std::endl;
     }
     return os;
 }
@@ -95,39 +95,70 @@ Matrix<T> matrixSum(Matrix<T>& matrix1, Matrix<T> matrix2) {
 }
 template<typename T>
 Matrix<T> operator+(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+    Matrix<T> sumResult(matrix1.size1(), matrix2.size2());
     try {
-        return matrixSum(matrix1, matrix2);
+        sumResult = matrixSum(matrix1, matrix2);
     } catch(char const* error) {
-        cout << error << endl;
+        std::cout << error << std::endl;
     }
+    return sumResult;
+}
+
+
+template<typename T>
+Matrix<T> matrixMin(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+    if (IsTypeChar<T>::value || IsTypeString<T>::value) {
+        throw "Matrices type is uncorrect!";
+    } else {
+        if (matrix1.size1() == matrix2.size1() && matrix1.size2() == matrix2.size2()) {
+            Matrix<T> minResult(matrix1.size1(), matrix2.size2());
+            for (size_t i = 0; i < minResult.size1(); i++) {
+                for (size_t j = 0; j < minResult.size2(); j++)
+                    minResult(i, j) = matrix1(i, j) - matrix2(i, j);
+            }
+            return minResult;
+        } else
+            throw "Matrices are not equal!";
+    }
+}
+template<typename T>
+Matrix<T> operator-(Matrix<T> matrix1, Matrix<T> matrix2) {
+    Matrix<T> minResult(matrix1.size1(), matrix2.size2());
+    try {
+        minResult = matrixMin(matrix1, matrix2);
+    } catch (char const* error) {
+        std::cout << error << std::endl;
+    }
+    return minResult;
 }
 
 template<typename T>
 Matrix<T> matrixMultiplication(Matrix<T>& matrix1, Matrix<T>& matrix2) {
-    if (IsTypeString<T>::value || IsTypeChar<T>::value) {
-        throw "Matrices of this type can't be multiplyed";
+    if (IsTypeChar<T>::value || IsTypeString<T>::value) {
+        throw "Matrices type is uncorrect!";
     } else {
-        if (matrix1.size2() == matrix1.size1()) {
-            Matrix<T> resultMatrix(matrix1.size1(), matrix2.size2());
+        if (matrix1.size2() == matrix2.size1()) {
+            Matrix<T> multiplicationResult(matrix1.size1(), matrix2.size2());
             for (size_t i = 0; i < matrix1.size1(); i++) {
                 for (size_t j = 0; j < matrix2.size2(); j++) {
                     for (size_t k = 0; k < matrix1.size2(); k++)
-                        resultMatrix(i, j) += matrix1(i, k) * matrix2(k, j);
+                        multiplicationResult(i, j) += matrix1(i, k) * matrix2(k, j);
                 }
             }
-            return resultMatrix;
-        } else {
+            return multiplicationResult;
+        } else
             throw "Matrices are not equal!";
-        }
     }
 }
 template<typename T>
 Matrix<T> operator*(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+    Matrix<T> multiplicationResult(matrix1.size1(), matrix2.size2());
     try {
-        return matrixMultiplication(matrix1, matrix2);
+        multiplicationResult = matrixMultiplication(matrix1, matrix2);
     } catch (char const* error) {
-        cout << error << endl;
+        std::cout << error << std::endl;
     }
+    return multiplicationResult;
 }
 
 
