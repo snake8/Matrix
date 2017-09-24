@@ -9,7 +9,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
-
+#include "TypesCheck.h" 
 #ifndef Matrix_h
 #define Matrix_h
 
@@ -27,22 +27,7 @@ public:
     T& operator()(size_t, size_t);
     void operator=(T);
     void operator+=(T);
-    void* transpose();
-};
-
-template<typename T>
-struct IsTypeString {
-    static const bool value = false;
-};
-template<> struct IsTypeString<std::string> {
-    static const bool value = true;
-};
-template<typename T>
-struct IsTypeChar {
-    static const bool value = false;
-};
-template<> struct IsTypeChar<char> {
-    static const bool value = true;
+    Matrix<T> transpose();
 };
 
 template<typename T>
@@ -60,6 +45,7 @@ template<typename T>
 size_t Matrix<T>::size2() {
     return this->matrix[0].size();
 }
+
 template<typename T>
 T& Matrix<T>::operator()(size_t row, size_t col) {
     return this->matrix[row][col];
@@ -161,5 +147,16 @@ Matrix<T> operator*(Matrix<T>& matrix1, Matrix<T>& matrix2) {
     return multiplicationResult;
 }
 
+//TODO (algorithm not fast enough)
+template<typename T>
+Matrix<T> Matrix<T>::transpose() {
+    Matrix<T> transposeResultMatrix(this->matrix[0].size(), this->matrix.size());
+    for (size_t i = 0; i < this->matrix.size(); ++i) {
+        for (size_t j = 0; j < this->matrix[i].size(); ++j)
+            transposeResultMatrix(j, i) = this->matrix[i][j];
+    }
+     
+    return transposeResultMatrix;
+}
 
 #endif /* Matrix_h */
