@@ -8,8 +8,18 @@
 
 #include "Matrix.h"
 
-// test here
+
+
+
 int main() {
-    
+    clock_t t1, t2;
+    Matrix<double> mat1(2, 2);
+    Matrix<double> mat2(2, 2);
+    Matrix<double> mat3;
+    t1 = clock();
+    // you can test runtime here
+    t2 = clock();
+    float runTime = ((float)t2 - (float)t1) / CLOCKS_PER_SEC;
+    std::cout << "Program tuntime: " << runTime << std::endl;
     return 0;
 }
