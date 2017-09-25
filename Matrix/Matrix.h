@@ -146,17 +146,32 @@ Matrix<T> operator*(Matrix<T>& matrix1, Matrix<T>& matrix2) {
     }
     return multiplicationResult;
 }
-
-//TODO (algorithm not fast enough)
 template<typename T>
-Matrix<T> Matrix<T>::transpose() {
-    Matrix<T> transposeResultMatrix(this->matrix[0].size(), this->matrix.size());
-    for (size_t i = 0; i < this->matrix.size(); ++i) {
-        for (size_t j = 0; j < this->matrix[i].size(); ++j)
-            transposeResultMatrix(j, i) = this->matrix[i][j];
+Matrix<T> transpose(Matrix<T>* matrix) {
+    Matrix<T>* transposedMatrix = new Matrix<T>(matrix->size2(), matrix->size1());
+    for (auto i = 0; i < matrix->size1(); i++) {
+        for (auto j = 0; j < matrix->size2(); j++)
+            transposedMatrix->operator()(j, i) = matrix->operator()(i, j);
     }
-     
-    return transposeResultMatrix;
+    return *transposedMatrix; 
+}
+
+
+
+template<typename T>
+void randomMatrixValuesGenerator(Matrix<T>& matrix, T from, T to) {
+    if (IsTypeChar<T>::value || IsTypeString<T>::value)
+        throw "Matrix type is uncorrect!";
+    else {
+        std::random_device rd;
+        std::mt19937 rng(rd());
+        for (size_t i = 0 ; i < matrix.size1(); i++) {
+            for (size_t j = 0; j < matrix.size2(); j++) {
+                std::uniform_real_distribution<T> dist(from, to);
+                matrix(i, j) = dist(rng);
+            }
+        }
+    }
 }
 
 #endif /* Matrix_h */
