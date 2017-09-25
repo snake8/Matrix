@@ -146,6 +146,7 @@ Matrix<T> operator*(Matrix<T>& matrix1, Matrix<T>& matrix2) {
     }
     return multiplicationResult;
 }
+
 template<typename T>
 Matrix<T> transpose(Matrix<T>* matrix) {
     Matrix<T>* transposedMatrix = new Matrix<T>(matrix->size2(), matrix->size1());
@@ -155,8 +156,6 @@ Matrix<T> transpose(Matrix<T>* matrix) {
     }
     return *transposedMatrix; 
 }
-
-
 
 template<typename T>
 void randomMatrixValuesGenerator(Matrix<T>& matrix, T from, T to) {
