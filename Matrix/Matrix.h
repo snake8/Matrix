@@ -76,7 +76,7 @@ void Matrix<T>::operator=(T value) {
 }
 
 template<typename T>
-std::ostream& operator<<(std::ostream& os, Matrix<T> matrix) {
+std::ostream& operator<<(std::ostream& os, Matrix<T>& matrix) {
     for (size_t i = 0; i < matrix.size1(); i++) {
         for (size_t j = 0; j < matrix.size2(); j++)
             os << matrix(i, j) << " ";
@@ -138,7 +138,7 @@ Matrix<T> matrixMin(Matrix<T>& matrix1, Matrix<T>& matrix2) {
     }
 }
 template<typename T>
-Matrix<T> operator-(Matrix<T> matrix1, Matrix<T> matrix2) {
+Matrix<T> operator-(Matrix<T>& matrix1, Matrix<T>& matrix2) {
     Matrix<T> minResult(matrix1.size1(), matrix2.size2());
     try {
         minResult = matrixMin(matrix1, matrix2);
