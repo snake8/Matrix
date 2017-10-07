@@ -26,10 +26,14 @@ public:
     size_t size1();
     size_t size2();
     void resizeMatrix(size_t rows, size_t columns);
+    void resizeMatrix1(size_t rows);
+    void resizeMatrix2(size_t columns);
     void insertVector(std::vector<T>* temp);
+    void removeColumn(size_t index);
     T& operator()(size_t, size_t);
+    void operator>>(Matrix<double>&);
     void operator=(T value);
-    void operator+=(T);
+    void operator+=(T& matrix);
 };
 
 template<typename T>
@@ -55,11 +59,28 @@ void Matrix<T>::resizeMatrix(size_t rows, size_t columns) {
         this->matrix[i].resize(columns);
 }
 
+template<typename T>
+void Matrix<T>::resizeMatrix1(size_t rows) {
+    this->matrix.resize(rows);
+}
+template<typename T>
+void Matrix<T>::resizeMatrix2(size_t columns) {
+    for (size_t i = 0; i < this->matrix.size(); i++)
+        this->matrix[i].resize(columns);
+}
 
 template<typename T>
 void Matrix<T>::insertVector(std::vector<T>* temp) {
     if (temp != nullptr)
         this->matrix.push_back(*temp);
+    else
+        std::cout << "ERROR: You pass pointer ot null object" << std::endl; 
+}
+
+template<typename T>
+void Matrix<T>::removeColumn(size_t index) {
+    for (size_t i = 0; i < this->matrix.size(); i++)
+        this->matrix[i].erase(this->matrix[i].begin() + index); 
 }
 
 template<typename T>
@@ -71,12 +92,21 @@ template<typename T>
 void Matrix<T>::operator=(T value) {
     for (size_t i = 0; i < this->matrix.size(); i++) {
         for (size_t j = 0; j < this->matrix[i].size(); j++)
-            this->matrix[i][j] = matrix(i, j);
+            this->matrix[i][j] = value;
     }
 }
 
 template<typename T>
-std::ostream& operator<<(std::ostream& os, Matrix<T>& matrix) {
+void Matrix<T>::operator>>(Matrix<double>& matrix) {
+    matrix.resizeMatrix(this->matrix.size(), this->matrix[0].size());
+    for (size_t i = 0; i < this->matrix.size(); i++) {
+        for (size_t j = 0; j < this->matrix[i].size(); j++)
+            matrix(i, j) = this->matrix[i][j]; 
+    }
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, Matrix<T> matrix) {
     for (size_t i = 0; i < matrix.size1(); i++) {
         for (size_t j = 0; j < matrix.size2(); j++)
             os << matrix(i, j) << " ";
@@ -90,10 +120,8 @@ std::ostream& operator<<(std::ostream& os, Matrix<T>& matrix) {
 
 template<typename T>
 bool operator==(Matrix<T>& matrix1, Matrix<T>& matrix2) {
-    if (matrix1.size1() == matrix2.size1() && matrix2.size2() == matrix2.size2())
-        return true;
-    else
-        return false;
+    const bool value = matrix1.size1() == matrix2.size1() && matrix1.size2() == matrix2.size2() ? true : false;
+    return value;
 }
 
 template<typename T>
@@ -106,7 +134,7 @@ Matrix<T> matrixSum(Matrix<T>& matrix1, Matrix<T> matrix2) {
         }
         return resultMatrix;
     } else
-        throw "Matrixes are not equal!";
+        throw "ERROR: Matrixes are not equal!";
 }
 
 template<typename T>
@@ -120,11 +148,19 @@ Matrix<T> operator+(Matrix<T>& matrix1, Matrix<T>& matrix2) {
     return sumResult;
 }
 
+template<typename T>
+void Matrix<T>::operator+=(T& value) {
+    for (size_t i = 0; i < this->matrix.size(); i++) {
+        for (size_t j = 0; j < this->matrix[i].size(); j++)
+            this->matrix[i][j] += value;
+    }
+}
+
 
 template<typename T>
 Matrix<T> matrixMin(Matrix<T>& matrix1, Matrix<T>& matrix2) {
     if (IsTypeChar<T>::value || IsTypeString<T>::value) {
-        throw "Matrices type is uncorrect!";
+        throw "ERROR: Matrices type is uncorrect!";
     } else {
         if (matrix1 == matrix2) {
             Matrix<T> minResult(matrix1.size1(), matrix2.size2());
@@ -134,11 +170,11 @@ Matrix<T> matrixMin(Matrix<T>& matrix1, Matrix<T>& matrix2) {
             }
             return minResult;
         } else
-            throw "Matrices are not equal!";
+            throw "ERROR: Matrices are not equal!bzzz";
     }
 }
 template<typename T>
-Matrix<T> operator-(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+Matrix<T> operator-(Matrix<T> matrix1, Matrix<T> matrix2) {
     Matrix<T> minResult(matrix1.size1(), matrix2.size2());
     try {
         minResult = matrixMin(matrix1, matrix2);
@@ -151,7 +187,7 @@ Matrix<T> operator-(Matrix<T>& matrix1, Matrix<T>& matrix2) {
 template<typename T>
 Matrix<T> matrixMultiplication(Matrix<T>& matrix1, Matrix<T>& matrix2) {
     if (IsTypeChar<T>::value || IsTypeString<T>::value) {
-        throw "Matrices type is uncorrect!";
+        throw "ERROR: Matrices type is uncorrect!";
     } else {
         if (matrix1.size2() == matrix2.size1()) {
             Matrix<T> multiplicationResult(matrix1.size1(), matrix2.size2());
@@ -163,9 +199,10 @@ Matrix<T> matrixMultiplication(Matrix<T>& matrix1, Matrix<T>& matrix2) {
             }
             return multiplicationResult;
         } else
-            throw "Matrices are not equal!";
+            throw "ERROR: Matrices are not equal!";
     }
 }
+
 template<typename T>
 Matrix<T> operator*(Matrix<T>& matrix1, Matrix<T>& matrix2) {
     Matrix<T> multiplicationResult(matrix1.size1(), matrix2.size2());
@@ -187,12 +224,10 @@ Matrix<T> transpose(Matrix<T>* matrix) {
     return *transposedMatrix; 
 }
 
-
-
 template<typename T>
 void randomMatrixValuesGenerator(Matrix<T>& matrix, T from, T to) {
     if (IsTypeChar<T>::value || IsTypeString<T>::value)
-        throw "Matrix type is uncorrect!";
+        throw "ERROR: Matrix type is uncorrect!";
     else {
         std::random_device rd;
         std::mt19937 rng(rd());
@@ -204,5 +239,23 @@ void randomMatrixValuesGenerator(Matrix<T>& matrix, T from, T to) {
         }
     }
 }
+
+template<typename T>
+Matrix<T> multiplyMatrixValueByValue(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+    Matrix<T> resultMatrix(matrix1.size1(), matrix2.size2());
+    if (matrix1 == matrix2) {
+        for (size_t i = 0; i < matrix1.size1(); i++) {
+            for (size_t j = 0; j < matrix1.size2(); j++)
+                resultMatrix(i, j) = matrix1(i, j) * matrix2(i, j);
+        }
+        return resultMatrix;
+    } else {
+        std::cout << "ERROR: Matrices are not equal!" << std::endl;
+        return resultMatrix;
+    }
+}
+
+
+
 
 #endif /* Matrix_h */
