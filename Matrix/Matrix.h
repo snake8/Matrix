@@ -23,17 +23,25 @@ private:
 public:
     Matrix() = default;
     Matrix(size_t, size_t);
-    size_t size1();
-    size_t size2();
+    size_t size1() const;
+    size_t size2() const;
+    T getMaxValue() const;
+    T getMinValue() const;
+    size_t getRowWithMaxValue() const;
+    size_t getRowWithMinValue() const;
+    // TODO
+    // T getStringWithMaxValue();
+    // T getStringWithMinValue();
     void resizeMatrix(size_t rows, size_t columns);
     void resizeMatrix1(size_t rows);
     void resizeMatrix2(size_t columns);
     void insertVector(std::vector<T>* temp);
-    void removeColumn(size_t index);
+    void removeRow(size_t index);
     T& operator()(size_t, size_t);
-    void operator>>(Matrix<double>&);
+    void operator>>(Matrix<T>& matrix);
     void operator=(T value);
     void operator+=(T& matrix);
+
 };
 
 template<typename T>
@@ -44,12 +52,56 @@ Matrix<T>::Matrix(size_t numOfRows, size_t numOfCols) : numberOfRows(numOfRows),
 }
 
 template<typename T>
-size_t Matrix<T>::size1() {
+size_t Matrix<T>::size1() const {
     return this->matrix.size();
 }
 template<typename T>
-size_t Matrix<T>::size2() {
+size_t Matrix<T>::size2() const {
     return this->matrix[0].size();
+}
+
+template<typename T>
+T Matrix<T>::getMaxValue() const {
+    std::vector<T> maxElementsInEachString;
+    for (size_t i = 0; i < this->matrix.size(); i++) {
+        auto maxIterInEachString = std::max_element(this->matrix[i].begin(), this->matrix[i].end());
+        maxElementsInEachString.push_back(this->matrix[i][std::distance(this->matrix[i].begin(), maxIterInEachString)]);
+    }
+    auto maxIter = std::max_element(maxElementsInEachString.begin(), maxElementsInEachString.end());
+    return maxElementsInEachString[std::distance(maxElementsInEachString.begin(), maxIter)];
+}
+
+template<typename T>
+T Matrix<T>::getMinValue() const {
+    std::vector<T> minElementsInEachString;
+    for (size_t i = 0; i < this->matrix.size(); i++) {
+        auto minIterInEachString = std::min_element(this->matrix[i].begin(), this->matrix[i].end());
+        minElementsInEachString.push_back(this->matrix[i][std::distance(this->matrix[i].begin(), minIterInEachString)]);
+    }
+    auto minIter = std::min_element(minElementsInEachString.begin(), minElementsInEachString.end());
+    return minElementsInEachString[std::distance(minElementsInEachString.begin(), minIter)];
+}
+
+template<typename T>
+size_t Matrix<T>::getRowWithMaxValue() const {
+    std::vector<T> maxElementsInEachString;
+    for (size_t i = 0; i < this->matrix.size(); i++) {
+        auto maxIterInEachString = std::max_element(this->matrix[i].begin(), this->matrix[i].end());
+        maxElementsInEachString.push_back(this->matrix[i][std::distance(this->matrix[i].begin(), maxIterInEachString)]);
+    }
+    auto maxIter = std::max_element(maxElementsInEachString.begin(), maxElementsInEachString.end());
+    return std::distance(maxElementsInEachString.begin(), maxIter);
+}
+
+template<typename T>
+size_t Matrix<T>::getRowWithMinValue() const {
+    std::vector<T> minElementsInEachString;
+    for (size_t i = 0; i < this->matrix.size(); i++) {
+        auto minIterInEachString = std::min_element(this->matrix[i].begin(), this->matrix[i].end());
+        minElementsInEachString.push_back(this->matrix[i][std::distance(this->matrix[i].begin(), minIterInEachString)]);
+    }
+    auto minIter = std::min_element(minElementsInEachString.begin(), minElementsInEachString.end());
+    return std::distance(minElementsInEachString.begin(), minIter);
 }
 
 template<typename T>
@@ -74,13 +126,13 @@ void Matrix<T>::insertVector(std::vector<T>* temp) {
     if (temp != nullptr)
         this->matrix.push_back(*temp);
     else
-        std::cout << "ERROR: You pass pointer ot null object" << std::endl; 
+        std::cout << "ERROR: You pass pointer ot null object" << std::endl;
 }
 
 template<typename T>
-void Matrix<T>::removeColumn(size_t index) {
+void Matrix<T>::removeRow(size_t index) {
     for (size_t i = 0; i < this->matrix.size(); i++)
-        this->matrix[i].erase(this->matrix[i].begin() + index); 
+        this->matrix[i].erase(this->matrix[i].begin() + index);
 }
 
 template<typename T>
@@ -97,12 +149,12 @@ void Matrix<T>::operator=(T value) {
 }
 
 template<typename T>
-void Matrix<T>::operator>>(Matrix<double>& matrix) {
-    matrix.resizeMatrix(this->matrix.size(), this->matrix[0].size());
-    for (size_t i = 0; i < this->matrix.size(); i++) {
-        for (size_t j = 0; j < this->matrix[i].size(); j++)
-            matrix(i, j) = this->matrix[i][j]; 
-    }
+void Matrix<T>::operator>>(Matrix<T>& matrix) {
+  matrix.resizeMatrix(this->matrix.size(), this->matrix[0].size());
+  for (size_t i = 0; i < matrix.size1(); i++) {
+    for (size_t j = 0; j < matrix.size2(); j++)
+      matrix(i, j) = this->matrix[i][j];
+  }
 }
 
 template<typename T>
@@ -173,6 +225,7 @@ Matrix<T> matrixMin(Matrix<T>& matrix1, Matrix<T>& matrix2) {
             throw "ERROR: Matrices are not equal!bzzz";
     }
 }
+
 template<typename T>
 Matrix<T> operator-(Matrix<T> matrix1, Matrix<T> matrix2) {
     Matrix<T> minResult(matrix1.size1(), matrix2.size2());
@@ -214,6 +267,7 @@ Matrix<T> operator*(Matrix<T>& matrix1, Matrix<T>& matrix2) {
     return multiplicationResult;
 }
 
+
 template<typename T>
 Matrix<T> transpose(Matrix<T>* matrix) {
     Matrix<T>* transposedMatrix = new Matrix<T>(matrix->size2(), matrix->size1());
@@ -221,11 +275,12 @@ Matrix<T> transpose(Matrix<T>* matrix) {
         for (auto j = 0; j < matrix->size2(); j++)
             transposedMatrix->operator()(j, i) = matrix->operator()(i, j);
     }
-    return *transposedMatrix; 
+    return *transposedMatrix;
 }
 
+
 template<typename T>
-void randomMatrixValuesGenerator(Matrix<T>& matrix, T from, T to) {
+void fillMatrixWithRandomValues(Matrix<T>& matrix, T from, T to) {
     if (IsTypeChar<T>::value || IsTypeString<T>::value)
         throw "ERROR: Matrix type is uncorrect!";
     else {
@@ -240,6 +295,7 @@ void randomMatrixValuesGenerator(Matrix<T>& matrix, T from, T to) {
     }
 }
 
+// TODO another solution possible
 template<typename T>
 Matrix<T> multiplyMatrixValueByValue(Matrix<T>& matrix1, Matrix<T>& matrix2) {
     Matrix<T> resultMatrix(matrix1.size1(), matrix2.size2());
@@ -254,8 +310,5 @@ Matrix<T> multiplyMatrixValueByValue(Matrix<T>& matrix1, Matrix<T>& matrix2) {
         return resultMatrix;
     }
 }
-
-
-
 
 #endif /* Matrix_h */
