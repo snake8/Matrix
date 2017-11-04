@@ -11,6 +11,9 @@
 #include <string>
 #include <random>
 #include "TypesCheck.h"
+
+
+
 #ifndef Matrix_h
 #define Matrix_h
 
@@ -27,19 +30,18 @@ public:
     size_t size2() const;
     T getMaxValue() const;
     T getMinValue() const;
-    size_t getRowWithMaxValue() const;
-    size_t getRowWithMinValue() const;
-    // TODO
-    // T getStringWithMaxValue();
-    // T getStringWithMinValue();
-    void resizeMatrix(size_t rows, size_t columns);
-    void resizeMatrix1(size_t rows);
-    void resizeMatrix2(size_t columns);
-    void insertVector(std::vector<T>* temp);
-    void removeRow(size_t index);
-    T& operator()(size_t, size_t);
-    void operator>>(Matrix<T>& matrix);
-    void operator=(T value);
+    size_t getStringIndexWithMaxValue() const;
+    size_t getStringIndexWithMinValue() const;
+    bool isValueInMatrix(const size_t row, const T value) const;
+    T getStringWithMaxValue() const;
+    T getStringWithMinValue() const;
+    void resizeMatrix(const size_t rows, const size_t columns);
+    void resizeMatrix1(const size_t rows);
+    void resizeMatrix2(const size_t columns);
+    void insertVector(const std::vector<T>* temp);
+    void removeRow(const size_t index);
+    T& operator()(const size_t, const size_t);
+    void operator=(const T value);
     void operator+=(T& matrix);
 
 };
@@ -61,68 +63,101 @@ size_t Matrix<T>::size2() const {
 }
 
 template<typename T>
+T get_max_element_in_vector(const std::vector<T>& vec) {
+    auto max_iter_element = std::max_element(vec.begin(), vec.end());
+    return vec[std::distance(vec.begin(), max_iter_element)];
+}
+
+template<typename T>
 T Matrix<T>::getMaxValue() const {
     std::vector<T> maxElementsInEachString;
     for (size_t i = 0; i < this->matrix.size(); i++) {
-        auto maxIterInEachString = std::max_element(this->matrix[i].begin(), this->matrix[i].end());
-        maxElementsInEachString.push_back(this->matrix[i][std::distance(this->matrix[i].begin(), maxIterInEachString)]);
+        maxElementsInEachString.push_back(get_max_element_in_vector(this->matrix[i]));
     }
     auto maxIter = std::max_element(maxElementsInEachString.begin(), maxElementsInEachString.end());
     return maxElementsInEachString[std::distance(maxElementsInEachString.begin(), maxIter)];
 }
 
 template<typename T>
-T Matrix<T>::getMinValue() const {
-    std::vector<T> minElementsInEachString;
-    for (size_t i = 0; i < this->matrix.size(); i++) {
-        auto minIterInEachString = std::min_element(this->matrix[i].begin(), this->matrix[i].end());
-        minElementsInEachString.push_back(this->matrix[i][std::distance(this->matrix[i].begin(), minIterInEachString)]);
-    }
-    auto minIter = std::min_element(minElementsInEachString.begin(), minElementsInEachString.end());
-    return minElementsInEachString[std::distance(minElementsInEachString.begin(), minIter)];
-}
-
-template<typename T>
-size_t Matrix<T>::getRowWithMaxValue() const {
+size_t Matrix<T>::getStringIndexWithMaxValue() const {
     std::vector<T> maxElementsInEachString;
     for (size_t i = 0; i < this->matrix.size(); i++) {
-        auto maxIterInEachString = std::max_element(this->matrix[i].begin(), this->matrix[i].end());
-        maxElementsInEachString.push_back(this->matrix[i][std::distance(this->matrix[i].begin(), maxIterInEachString)]);
+        maxElementsInEachString.push_back(get_max_element_in_vector(this->matrix[i]));
     }
     auto maxIter = std::max_element(maxElementsInEachString.begin(), maxElementsInEachString.end());
     return std::distance(maxElementsInEachString.begin(), maxIter);
 }
 
 template<typename T>
-size_t Matrix<T>::getRowWithMinValue() const {
+T get_min_element_in_vector(const std::vector<T>& vec) {
+    auto min_iter_element = std::min_element(vec.begin(), vec.end());
+    return vec[std::distance(vec.begin(), min_iter_element)];
+}
+
+template<typename T>
+T Matrix<T>::getMinValue() const {
     std::vector<T> minElementsInEachString;
     for (size_t i = 0; i < this->matrix.size(); i++) {
-        auto minIterInEachString = std::min_element(this->matrix[i].begin(), this->matrix[i].end());
-        minElementsInEachString.push_back(this->matrix[i][std::distance(this->matrix[i].begin(), minIterInEachString)]);
+        minElementsInEachString.push_back(get_min_element_in_vector(this->matrix[i]));
+    }
+    auto minIter = std::min_element(minElementsInEachString.begin(), minElementsInEachString.end());
+    return minElementsInEachString[std::distance(minElementsInEachString.begin(), minIter)];
+}
+
+template<typename T>
+size_t Matrix<T>::getStringIndexWithMinValue() const {
+    std::vector<T> minElementsInEachString;
+    for (size_t i = 0; i < this->matrix.size(); i++) {
+        minElementsInEachString.push_back(get_min_element_in_vector(this->matrix[i]));
     }
     auto minIter = std::min_element(minElementsInEachString.begin(), minElementsInEachString.end());
     return std::distance(minElementsInEachString.begin(), minIter);
 }
 
 template<typename T>
-void Matrix<T>::resizeMatrix(size_t rows, size_t columns) {
+bool binary_search(std::vector<T> data, T target, size_t low, size_t high) {
+    if (low > high)
+        return false;
+    else {
+        size_t mid = (low + high) / 2;
+        if (target == data[mid])
+            return true;
+        else if (target < data[mid])
+            return binary_search(data, target, low, mid - 1);
+        else
+            return binary_search(data, target, mid + 1, high);
+    }
+}
+
+template<typename T>
+bool Matrix<T>::isValueInMatrix(const size_t row, const T value) const {
+    std::vector<T> data = this->matrix[row];
+    std::sort(data.begin(), data.end());
+    return binary_search(data, value, 0, data.size());
+}
+
+
+
+
+template<typename T>
+void Matrix<T>::resizeMatrix(const size_t rows, const size_t columns) {
     this->matrix.resize(rows);
     for (size_t i = 0; i < rows; i++)
         this->matrix[i].resize(columns);
 }
 
 template<typename T>
-void Matrix<T>::resizeMatrix1(size_t rows) {
+void Matrix<T>::resizeMatrix1(const size_t rows) {
     this->matrix.resize(rows);
 }
 template<typename T>
-void Matrix<T>::resizeMatrix2(size_t columns) {
+void Matrix<T>::resizeMatrix2(const size_t columns) {
     for (size_t i = 0; i < this->matrix.size(); i++)
         this->matrix[i].resize(columns);
 }
 
 template<typename T>
-void Matrix<T>::insertVector(std::vector<T>* temp) {
+void Matrix<T>::insertVector(const std::vector<T>* temp) {
     if (temp != nullptr)
         this->matrix.push_back(*temp);
     else
@@ -130,32 +165,25 @@ void Matrix<T>::insertVector(std::vector<T>* temp) {
 }
 
 template<typename T>
-void Matrix<T>::removeRow(size_t index) {
+void Matrix<T>::removeRow(const size_t index) {
     for (size_t i = 0; i < this->matrix.size(); i++)
         this->matrix[i].erase(this->matrix[i].begin() + index);
 }
 
 template<typename T>
-T& Matrix<T>::operator()(size_t row, size_t col) {
+T& Matrix<T>::operator()(const size_t row, const size_t col) {
     return this->matrix[row][col];
 }
 
 template<typename T>
-void Matrix<T>::operator=(T value) {
+void Matrix<T>::operator=(const T value) {
     for (size_t i = 0; i < this->matrix.size(); i++) {
         for (size_t j = 0; j < this->matrix[i].size(); j++)
             this->matrix[i][j] = value;
     }
 }
 
-template<typename T>
-void Matrix<T>::operator>>(Matrix<T>& matrix) {
-  matrix.resizeMatrix(this->matrix.size(), this->matrix[0].size());
-  for (size_t i = 0; i < matrix.size1(); i++) {
-    for (size_t j = 0; j < matrix.size2(); j++)
-      matrix(i, j) = this->matrix[i][j];
-  }
-}
+
 
 template<typename T>
 std::ostream& operator<<(std::ostream& os, Matrix<T> matrix) {
@@ -171,9 +199,8 @@ std::ostream& operator<<(std::ostream& os, Matrix<T> matrix) {
 
 
 template<typename T>
-bool operator==(Matrix<T>& matrix1, Matrix<T>& matrix2) {
-    const bool value = matrix1.size1() == matrix2.size1() && matrix1.size2() == matrix2.size2() ? true : false;
-    return value;
+bool operator==(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
+    return matrix1.size1() == matrix2.size1() && matrix1.size2() == matrix2.size2() ? true : false;
 }
 
 template<typename T>
@@ -237,21 +264,27 @@ Matrix<T> operator-(Matrix<T> matrix1, Matrix<T> matrix2) {
     return minResult;
 }
 
+
 template<typename T>
-Matrix<T> matrixMultiplication(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+Matrix<T> matrix_mult(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+    Matrix<T> multiplicationResult(matrix1.size1(), matrix2.size2());
+    for (size_t i = 0; i < matrix1.size1(); i++) {
+        for (size_t j = 0; j < matrix2.size2(); j++) {
+            for (size_t k = 0; k < matrix1.size2(); k++)
+                multiplicationResult(i, j) += matrix1(i, k) * matrix2(k, j);
+        }
+    }
+    return multiplicationResult;
+}
+
+template<typename T>
+Matrix<T> get_matrix_mult(Matrix<T>& matrix1, Matrix<T>& matrix2) {
     if (IsTypeChar<T>::value || IsTypeString<T>::value) {
         throw "ERROR: Matrices type is uncorrect!";
     } else {
-        if (matrix1.size2() == matrix2.size1()) {
-            Matrix<T> multiplicationResult(matrix1.size1(), matrix2.size2());
-            for (size_t i = 0; i < matrix1.size1(); i++) {
-                for (size_t j = 0; j < matrix2.size2(); j++) {
-                    for (size_t k = 0; k < matrix1.size2(); k++)
-                        multiplicationResult(i, j) += matrix1(i, k) * matrix2(k, j);
-                }
-            }
-            return multiplicationResult;
-        } else
+        if (matrix1.size2() == matrix2.size1())
+            return matrix_mult(matrix1, matrix2);
+        else
             throw "ERROR: Matrices are not equal!";
     }
 }
@@ -260,7 +293,7 @@ template<typename T>
 Matrix<T> operator*(Matrix<T>& matrix1, Matrix<T>& matrix2) {
     Matrix<T> multiplicationResult(matrix1.size1(), matrix2.size2());
     try {
-        multiplicationResult = matrixMultiplication(matrix1, matrix2);
+        multiplicationResult = get_matrix_mult(matrix1, matrix2);
     } catch(char const* error) {
         std::cout << error << std::endl;
     }
@@ -278,15 +311,14 @@ Matrix<T> transpose(Matrix<T>* matrix) {
     return *transposedMatrix;
 }
 
-
 template<typename T>
-void fillMatrixWithRandomValues(Matrix<T>& matrix, T from, T to) {
+void fillMatrixWithRandomValues(Matrix<T>& matrix, const size_t from, const size_t to) {
     if (IsTypeChar<T>::value || IsTypeString<T>::value)
         throw "ERROR: Matrix type is uncorrect!";
     else {
         std::random_device rd;
         std::mt19937 rng(rd());
-        for (size_t i = 0 ; i < matrix.size1(); i++) {
+        for (size_t i = 0; i < matrix.size1(); i++) {
             for (size_t j = 0; j < matrix.size2(); j++) {
                 std::uniform_real_distribution<T> dist(from, to);
                 matrix(i, j) = dist(rng);
@@ -312,3 +344,4 @@ Matrix<T> multiplyMatrixValueByValue(Matrix<T>& matrix1, Matrix<T>& matrix2) {
 }
 
 #endif /* Matrix_h */
+
