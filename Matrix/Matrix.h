@@ -25,6 +25,13 @@ private:
     size_t numberOfRows;
     size_t numberOfColumns;
     std::vector<std::vector<T>> matrix;
+    // functions
+    static Matrix<T> dotProduct(Matrix<T>&, Matrix<T>&);
+    static Matrix<T> dot(Matrix<T>&, Matrix<T>&);
+    static Matrix<T> matrixsum(Matrix<T>&, Matrix<T>&);
+    static Matrix<T> getMatrixSum(Matrix<T>&, Matrix<T>&);
+    static Matrix<T> matrixmin(Matrix<T>&, Matrix<T>&);
+    static Matrix<T> getMatrixMin(Matrix<T>&, Matrix<T>&);
 public:
     Matrix() = default;
     Matrix(size_t, size_t);
@@ -50,8 +57,22 @@ public:
     T& operator()(const size_t, const size_t);
     void operator=(const T value);
     void operator+=(T& matrix);
-    
+    // math operations
+    static Matrix<T> transpose(Matrix<T> * const);
+    static Matrix<T> getdot(Matrix<T>&, Matrix<T>&);
+    static Matrix<T> sum(Matrix<T>&, Matrix<T>&);
+    static Matrix<T> min(Matrix<T>&, Matrix<T>&);
 };
+
+// declaration of overloading functions:
+// ...
+template<typename T>
+bool operator==(const Matrix<T>&, const Matrix<T>&);
+template<typename T>
+std::ostream& operator<<(std::ostream&, Matrix<T>&);
+
+
+
 
 template<typename T>
 Matrix<T>::Matrix(size_t numOfRows, size_t numOfCols) : numberOfRows(numOfRows), numberOfColumns(numOfCols) {
@@ -204,7 +225,7 @@ void Matrix<T>::operator=(const T value) {
 }
 
 template<typename T>
-std::ostream& operator<<(std::ostream& os, Matrix<T> matrix) {
+std::ostream& operator<<(std::ostream& os, Matrix<T>& matrix) {
     for (size_t i = 0; i < matrix.size1(); i++) {
         for (size_t j = 0; j < matrix.size2(); j++)
             os << matrix(i, j) << " ";
@@ -215,34 +236,9 @@ std::ostream& operator<<(std::ostream& os, Matrix<T> matrix) {
     return os;
 }
 
-
 template<typename T>
-bool operator==(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
+bool operator==(const Matrix<T>& matrix1, const Matrix<T>& matrix2)  {
     return matrix1.size1() == matrix2.size1() && matrix1.size2() == matrix2.size2() ? true : false;
-}
-
-template<typename T>
-Matrix<T> matrixSum(Matrix<T>& matrix1, Matrix<T>& matrix2) {
-    if (matrix1 == matrix2) {
-        Matrix<T> resultMatrix(matrix1.size1(), matrix2.size2());
-        for (size_t i = 0; i < resultMatrix.size1(); i++) {
-            for (size_t j = 0; j < resultMatrix.size2(); j++)
-                resultMatrix(i, j) = matrix1(i, j) + matrix2(i, j);
-        }
-        return resultMatrix;
-    }
-    throw MatrixExceptions("Error: Matrices are not equal");
-}
-
-template<typename T>
-Matrix<T> operator+(Matrix<T>& matrix1, Matrix<T>& matrix2) {
-    try {
-        return matrixSum(matrix1, matrix2);
-    } catch(MatrixExceptions& e) {
-        std::cout << e.backtrace << std::endl;
-        std::cout << e.error << std::endl;
-        exit(1);
-    }
 }
 
 template<typename T>
@@ -253,68 +249,101 @@ void Matrix<T>::operator+=(T& value) {
     }
 }
 
+// transpose function
+
 
 template<typename T>
-Matrix<T> matrixMin(Matrix<T>& matrix1, Matrix<T>& matrix2) {
-    if (matrix1 == matrix2) {
-        Matrix<T> result = {matrix1.size1(), matrix1.size2()};
-        for (size_t i = 0; i < matrix1.size1(); i++) {
-            for (size_t j = 0; j < matrix1.size2(); j++)
-                result(i, j) = matrix1(i, j) - matrix2(i, j);
-        }
-    }
-    throw MatrixExceptions("Matrices are not equal!");
-}
-
-template<typename T>
-Matrix<T> operator-(Matrix<T> matrix1, Matrix<T> matrix2) {
+Matrix<T> Matrix<T>::getdot(Matrix<T>& matrix1, Matrix<T>& matrix2) {
     try {
-        return matrixMin(matrix1, matrix2);
-    } catch (MatrixExceptions& e) {
-        std::cout << e.backtrace << std::endl;
-        std::cout << e.error << std::endl;
+        return Matrix<T>::dotProduct(matrix1, matrix2);
+    } catch (MultiplicationError& e) {
+        std::cout << e.getError() << std::endl;
+        std::cout << e.getBacktrace << std::endl;
         exit(1);
     }
 }
 
+template<typename T>
+Matrix<T> Matrix<T>::dotProduct(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+    if (!(matrix1.size2() == matrix2.size1()))
+        throw MultiplicationError();
+    return dot(matrix1, matrix2);
+}
 
 template<typename T>
-Matrix<T> matrix_mult(Matrix<T>& matrix1, Matrix<T>& matrix2) {
-    Matrix<T> multiplicationResult(matrix1.size1(), matrix2.size2());
+Matrix<T> Matrix<T>::dot(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+    Matrix<T> resultMatrix = {matrix1.size1(), matrix2.size2()};
     for (size_t i = 0; i < matrix1.size1(); i++) {
         for (size_t j = 0; j < matrix2.size2(); j++) {
             for (size_t k = 0; k < matrix1.size2(); k++)
-                multiplicationResult(i, j) += matrix1(i, k) * matrix2(k, j);
+                resultMatrix(i, j) += matrix1(i, k) * matrix2(k, j);
         }
     }
-    return multiplicationResult;
+    return resultMatrix;
 }
 
 template<typename T>
-Matrix<T> get_matrix_mult(Matrix<T>& matrix1, Matrix<T>& matrix2) {
-    if (matrix1.size2() == matrix2.size1())
-        return matrix_mult(matrix1, matrix2);
-    throw MatrixExceptions("Error: Number of strings in first matrix not equal to number of rows in second");
-}
-
-template<typename T>
-Matrix<T> operator*(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+Matrix<T> Matrix<T>::sum(Matrix<T>& matrix1, Matrix<T>& matrix2) {
     try {
-        return get_matrix_mult(matrix1, matrix2);
-    } catch (MatrixExceptions& e) {
-        std::cout << e.backtrace << std::endl;
-        std::cout << e.error << std::endl;
+        return matrixsum(matrix1, matrix2);
+    } catch (SumOrMinError& e) {
+        std::cout << e.getError() << std::endl;
+        std::cout << e.getBacktrace << std::endl;
         exit(1);
     }
 }
 
+template<typename T>
+Matrix<T> Matrix<T>::matrixsum(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+    if (!(matrix1 == matrix2))
+        throw SumOrMinError();
+    return getMatrixSum(matrix1, matrix2);
+}
 
 template<typename T>
-Matrix<T> transpose(Matrix<T> * const matrix) {
-    Matrix<T> transposedMatrix = *matrix;
+Matrix<T> Matrix<T>::getMatrixSum(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+    Matrix<T> result = {matrix1.size1(), matrix1.size2()};
+    for (size_t i = 0; i < result.size1(); i++) {
+        for (size_t j = 0; j < result.size2(); j++)
+            result(i, j) = matrix1(i, j) + matrix2(i, j);
+    }
+    return result;
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::min(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+    try {
+        return matrixmin(matrix1, matrix2);
+    } catch (SumOrMinError& e) {
+        std::cout << e.getError() << std::endl;
+        std::cout << e.getBacktrace << std::endl;
+        exit(1);
+    }
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::matrixmin(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+    if (!(matrix1 == matrix2))
+        throw SumOrMinError();
+    return getMatrixMin(matrix1, matrix2);
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::getMatrixMin(Matrix<T>& matrix1, Matrix<T>& matrix2) {
+    Matrix<T> result = {matrix1.size1(), matrix1.size2()};
+    for (size_t i = 0; i < result.size1(); i++) {
+        for (size_t j = 0; j < result.size2(); j++)
+            result(i, j) = matrix1(i, j) - matrix2(i, j);
+    }
+    return result;
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::transpose(Matrix<T> * const matrix) {
+    Matrix<T> transposedMatrix = {matrix->size2(), matrix->size1()};
     for (size_t i = 0; i < matrix->size1(); i++) {
-        for (size_t j =0; j < matrix->size2(); j++)
-            transposedMatrix(j, i) = matrix->operator()(i)[j];
+        for (size_t j = 0; j < matrix->size2(); j++)
+            transposedMatrix(i, j) = matrix->operator()(i, j);
     }
     return transposedMatrix;
 }
