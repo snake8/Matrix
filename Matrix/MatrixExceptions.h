@@ -11,12 +11,32 @@
 #include "stacktrace.h"
 
 
-class MatrixExceptions : public std::runtime_error {
+class IMatrixExceptions {
 public:
-    MatrixExceptions(const char* msg) : std::runtime_error(msg) { }
-    std::string error = std::runtime_error::what();
-    std::string backtrace = Backtrace(1);
+    virtual std::string getError() = 0;
+    std::string getBacktrace = Backtrace(0);
 };
+
+
+class MultiplicationError : public IMatrixExceptions {
+private:
+    const std::string error = "First matrix number of rows does not equal to second matrix number of strings.";
+public:
+    std::string getError() {
+        return error;
+    }
+};
+
+class SumOrMinError : public IMatrixExceptions {
+private:
+    const std::string error = "First matrix number of strings and rows does not equal to second matrix number of rows and strings.";
+public:
+    std::string getError() {
+        return error; 
+    }
+};
+
+
 
 
 #endif /* MatrixExceptions_h */
