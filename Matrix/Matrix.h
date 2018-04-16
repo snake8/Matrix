@@ -108,14 +108,14 @@ inline size_t Matrix<T>::size2() const
 }
 
 template<typename T>
-inline T get_max_element_in_vector(const std::vector<T>& vec)
+T get_max_element_in_vector(const std::vector<T>& vec)
 {
     auto max_iter_element = std::max_element(vec.begin(), vec.end());
     return vec[std::distance(vec.begin(), max_iter_element)];
 }
 
 template<typename T>
-inline T Matrix<T>::getMaxValue() const
+T Matrix<T>::getMaxValue() const
 {
     std::vector<T> maxElementsInEachString;
     for (size_t i = 0; i < m_matrix.size(); i++)
@@ -125,7 +125,7 @@ inline T Matrix<T>::getMaxValue() const
 }
 
 template<typename T>
-inline size_t Matrix<T>::getStringIndexWithMaxValue() const
+size_t Matrix<T>::getStringIndexWithMaxValue() const
 {
     std::vector<T> maxElementsInEachString;
     for (size_t i = 0; i < m_matrix.size(); i++)
@@ -135,14 +135,14 @@ inline size_t Matrix<T>::getStringIndexWithMaxValue() const
 }
 
 template<typename T>
-inline T get_min_element_in_vector(const std::vector<T>& vec)
+T get_min_element_in_vector(const std::vector<T>& vec)
 {
     auto min_iter_element = std::min_element(vec.begin(), vec.end());
     return vec[std::distance(vec.begin(), min_iter_element)];
 }
 
 template<typename T>
-inline T Matrix<T>::getMinValue() const
+T Matrix<T>::getMinValue() const
 {
     std::vector<T> minElementsInEachString;
     for (size_t i = 0; i < m_matrix.size(); i++)
@@ -152,7 +152,7 @@ inline T Matrix<T>::getMinValue() const
 }
 
 template<typename T>
-inline size_t Matrix<T>::getStringIndexWithMinValue() const
+size_t Matrix<T>::getStringIndexWithMinValue() const
 {
     std::vector<T> minElementsInEachString;
     for (size_t i = 0; i < m_matrix.size(); i++)
@@ -162,7 +162,7 @@ inline size_t Matrix<T>::getStringIndexWithMinValue() const
 }
 
 template<typename T>
-inline bool binary_search(std::vector<T> data, T target, size_t low, size_t high)
+bool binary_search(std::vector<T> data, T target, size_t low, size_t high)
 {
     if (low > high) return false;
     size_t mid = (low + high) / 2;
@@ -175,7 +175,7 @@ inline bool binary_search(std::vector<T> data, T target, size_t low, size_t high
 }
 
 template<typename T>
-inline bool Matrix<T>::isValueInMatrix(const size_t row, const T value) const
+bool Matrix<T>::isValueInMatrix(const size_t row, const T value) const
 {
     std::vector<T> data = m_matrix[row];
     std::sort(data.begin(), data.end());
@@ -183,7 +183,7 @@ inline bool Matrix<T>::isValueInMatrix(const size_t row, const T value) const
 }
 
 template<typename T>
-inline void Matrix<T>::resizeMatrix(const size_t rows, const size_t columns)
+void Matrix<T>::resizeMatrix(const size_t rows, const size_t columns)
 {
     m_matrix.resize(rows);
     for (size_t i = 0; i < rows; i++)
@@ -191,25 +191,25 @@ inline void Matrix<T>::resizeMatrix(const size_t rows, const size_t columns)
 }
 
 template<typename T>
-inline void Matrix<T>::resizeMatrix1(const size_t rows)
+void Matrix<T>::resizeMatrix1(const size_t rows)
 {
     m_matrix.resize(rows);
 }
 template<typename T>
-inline void Matrix<T>::resizeMatrix2(const size_t columns)
+void Matrix<T>::resizeMatrix2(const size_t columns)
 {
     for (size_t i = 0; i < m_matrix.size(); i++)
         m_matrix[i].resize(columns);
 }
 
 template<typename T>
-inline void Matrix<T>::insertVector(const std::vector<T>& temp)
+void Matrix<T>::insertVector(const std::vector<T>& temp)
 {
     m_matrix.push_back(temp);
 }
 
 template<typename T>
-inline void Matrix<T>::removeRow(const size_t index)
+void Matrix<T>::removeRow(const size_t index)
 {
     for (size_t i = 0; i < m_matrix.size(); i++)
         m_matrix[i].erase(m_matrix[i].begin() + index);
@@ -222,7 +222,7 @@ inline T& Matrix<T>::operator()(const size_t row, const size_t col)
 }
 
 template<typename T>
-inline void Matrix<T>::operator=(const T value)
+void Matrix<T>::operator=(const T value)
 {
     for (size_t i = 0; i < m_matrix.size(); i++)
     {
@@ -246,13 +246,13 @@ std::ostream& operator<<(std::ostream& os, Matrix<T>& matrix)
 }
 
 template<typename T>
-inline bool operator==(const Matrix<T>& matrix1, const Matrix<T>& matrix2)
+bool operator==(const Matrix<T>& matrix1, const Matrix<T>& matrix2)
 {
     return matrix1.size1() == matrix2.size1() && matrix1.size2() == matrix2.size2() ? true : false;
 }
 
 template<typename T>
-inline void Matrix<T>::operator+=(T& value)
+void Matrix<T>::operator+=(T& value)
 {
     for (size_t i = 0; i < m_matrix.size(); i++)
     {
@@ -263,7 +263,7 @@ inline void Matrix<T>::operator+=(T& value)
 
 
 template<typename T>
-inline Matrix<T> Matrix<T>::getdot(Matrix<T>& matrix1, Matrix<T>& matrix2)
+Matrix<T> Matrix<T>::getdot(Matrix<T>& matrix1, Matrix<T>& matrix2)
 {
     try
     {
@@ -278,13 +278,13 @@ inline Matrix<T> Matrix<T>::getdot(Matrix<T>& matrix1, Matrix<T>& matrix2)
 }
 
 template<typename T>
-inline Matrix<T> Matrix<T>::dotProduct(Matrix<T>& matrix1, Matrix<T>& matrix2)
+Matrix<T> Matrix<T>::dotProduct(Matrix<T>& matrix1, Matrix<T>& matrix2)
 {
     return matrix1.size2() == matrix2.size1() ? dot(matrix1, matrix2) : throw SizeError();
 }
 
 template<typename T>
-inline Matrix<T> Matrix<T>::dot(Matrix<T>& matrix1, Matrix<T>& matrix2)
+Matrix<T> Matrix<T>::dot(Matrix<T>& matrix1, Matrix<T>& matrix2)
 {
     Matrix<T> resultMatrix = {matrix1.size1(), matrix2.size2()};
     for (size_t i = 0; i < matrix1.size1(); i++)
@@ -299,7 +299,7 @@ inline Matrix<T> Matrix<T>::dot(Matrix<T>& matrix1, Matrix<T>& matrix2)
 }
 
 template<typename T>
-inline Matrix<T> Matrix<T>::sum(Matrix<T>& matrix1, Matrix<T>& matrix2)
+Matrix<T> Matrix<T>::sum(Matrix<T>& matrix1, Matrix<T>& matrix2)
 {
     try
     {
@@ -314,13 +314,13 @@ inline Matrix<T> Matrix<T>::sum(Matrix<T>& matrix1, Matrix<T>& matrix2)
 }
 
 template<typename T>
-inline Matrix<T> Matrix<T>::matrixsum(Matrix<T>& matrix1, Matrix<T>& matrix2)
+Matrix<T> Matrix<T>::matrixsum(Matrix<T>& matrix1, Matrix<T>& matrix2)
 {
     return matrix1 == matrix2 ? getMatrixSum(matrix1, matrix2) : throw SizeError();
 }
 
 template<typename T>
-inline Matrix<T> Matrix<T>::getMatrixSum(Matrix<T>& matrix1, Matrix<T>& matrix2)
+Matrix<T> Matrix<T>::getMatrixSum(Matrix<T>& matrix1, Matrix<T>& matrix2)
 {
     Matrix<T> result = {matrix1.size1(), matrix1.size2()};
     for (size_t i = 0; i < result.size1(); i++)
@@ -332,7 +332,7 @@ inline Matrix<T> Matrix<T>::getMatrixSum(Matrix<T>& matrix1, Matrix<T>& matrix2)
 }
 
 template<typename T>
-inline Matrix<T> Matrix<T>::min(Matrix<T>& matrix1, Matrix<T>& matrix2)
+Matrix<T> Matrix<T>::min(Matrix<T>& matrix1, Matrix<T>& matrix2)
 {
     try
     {
@@ -347,13 +347,13 @@ inline Matrix<T> Matrix<T>::min(Matrix<T>& matrix1, Matrix<T>& matrix2)
 }
 
 template<typename T>
-inline Matrix<T> Matrix<T>::matrixmin(Matrix<T>& matrix1, Matrix<T>& matrix2)
+Matrix<T> Matrix<T>::matrixmin(Matrix<T>& matrix1, Matrix<T>& matrix2)
 {
     return matrix1 == matrix2 ? getMatrixMin(matrix1, matrix2) : throw SizeError();
 }
 
 template<typename T>
-inline Matrix<T> Matrix<T>::getMatrixMin(Matrix<T>& matrix1, Matrix<T>& matrix2)
+Matrix<T> Matrix<T>::getMatrixMin(Matrix<T>& matrix1, Matrix<T>& matrix2)
 {
     Matrix<T> result(matrix1.size1(), matrix1.size2());
     for (size_t i = 0; i < result.size1(); i++)
@@ -377,7 +377,7 @@ inline Matrix<T> Matrix<T>::transpose(Matrix<double> &mat)
 }
 
 template<typename T>
-inline Matrix<T> operator*(T value, Matrix<T>& mat)
+Matrix<T> operator*(T value, Matrix<T>& mat)
 {
     for (size_t i = 0; i < mat.size1(); i++)
     {
@@ -389,13 +389,13 @@ inline Matrix<T> operator*(T value, Matrix<T>& mat)
 
 
 template<typename T>
-inline bool operator!(const Matrix<T>& mat)
+bool operator!(const Matrix<T>& mat)
 {
     return !mat.size1() && !mat.size2() ? true : false;
 }
 
 template<typename T>
-inline Matrix<T> operator+(T value, Matrix<T>& mat)
+Matrix<T> operator+(T value, Matrix<T>& mat)
 {
     for (size_t i = 0; i < mat.size1(); i++)
     {
@@ -406,7 +406,7 @@ inline Matrix<T> operator+(T value, Matrix<T>& mat)
 }
 
 template<typename T>
-inline Matrix<T> operator-(T value, Matrix<T>& mat)
+Matrix<T> operator-(T value, Matrix<T>& mat)
 {
     for (size_t i = 0; i < mat.size1(); i++)
     {
@@ -417,7 +417,7 @@ inline Matrix<T> operator-(T value, Matrix<T>& mat)
 }
 
 template<typename T>
-inline void Matrix<T>::generateRandomMatrixFromMatrix(Matrix<T>& matrix, size_t from, size_t to)
+void Matrix<T>::generateRandomMatrixFromMatrix(Matrix<T>& matrix, size_t from, size_t to)
 {
     std::random_device rd;
     std::mt19937 rng(rd());
